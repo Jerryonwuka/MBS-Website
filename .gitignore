@@ -1,0 +1,8 @@
+# Original master videos (too large for GitHub's 100 MB limit).
+# The site uses the web-compressed copies in assets/video/.
+/*.mov
+/*.mp4
+
+# OS / editor
+.DS_Store
+.claude/
