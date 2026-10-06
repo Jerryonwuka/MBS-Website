@@ -12,6 +12,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
+  <script>
+    // apply a saved light/dark choice before first paint (otherwise the device setting is used)
+    try { var t = localStorage.getItem('mb-theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
 </head>
 <body data-page="project">
 
@@ -26,6 +30,7 @@
       <a href="index.html#services" class="u-link">Services</a>
       <a href="index.html#index" class="u-link">Index</a>
       <a href="#contact" class="u-link">Contact</a>
+      <button class="nav__theme js-theme" type="button" aria-label="Switch colour theme"><span class="nav__theme-icon" aria-hidden="true"></span><span class="nav__theme-label js-theme-label">Dark</span></button>
     </div>
     <div class="nav__time">Abuja <span class="js-time">--:--</span> WAT</div>
     <a class="nav__mail u-link" href="mailto:motionbox.ng@gmail.com">motionbox.ng@gmail.com</a>

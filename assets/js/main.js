@@ -22,6 +22,7 @@
   const store = {
     get(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
     set(k, v) { try { sessionStorage.setItem(k, v); } catch (e) { /* private mode */ } },
+    local(theme) { try { localStorage.setItem('mb-theme', theme); } catch (e) { /* private mode */ } },
   };
 
   gsap.registerPlugin(ScrollTrigger, SplitText);
@@ -80,6 +81,38 @@
     tick();
     setInterval(tick, 10000);
   }
+
+  /* ---------- Light / dark theme ---------- */
+  // No saved choice = follow the device setting. The head script applies a saved choice before paint.
+  const root = document.documentElement;
+  const systemDark = matchMedia('(prefers-color-scheme: dark)');
+  const currentTheme = () => root.dataset.theme || (systemDark.matches ? 'dark' : 'light');
+  const syncThemeUI = () => {
+    const next = currentTheme() === 'dark' ? 'light' : 'dark';
+    $$('.js-theme').forEach((b) => b.setAttribute('aria-label', `Switch to ${next} mode`));
+    $$('.js-theme-label').forEach((l) => { l.textContent = next === 'dark' ? 'Dark' : 'Light'; });
+  };
+  syncThemeUI();
+  systemDark.addEventListener('change', syncThemeUI);
+  $$('.js-theme').forEach((btn) => btn.addEventListener('click', () => {
+    const next = currentTheme() === 'dark' ? 'light' : 'dark';
+    const apply = () => {
+      root.dataset.theme = next;
+      store.local(next);
+      syncThemeUI();
+    };
+    if (!document.startViewTransition || REDUCED) { apply(); return; }
+    // the new theme grows out of the toggle as a circle
+    const r = btn.getBoundingClientRect();
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    document.startViewTransition(apply).ready.then(() => {
+      root.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+        { duration: 800, easing: 'cubic-bezier(.65, .05, 0, 1)', pseudoElement: '::view-transition-new(root)' },
+      );
+    }).catch(() => {});
+  }));
 
   /* ---------- Cursor ---------- */
   if (FINE) {
